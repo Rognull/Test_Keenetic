@@ -37,8 +37,9 @@ var (
 func (q queue) putInQueue(queueName string, itemName string) {
 	j, ok := q.items[queueName]
 	if !ok {
+		buf := &item{name: itemName}
 		q.items[queueName] = &queueItems{
-			head: &item{name: itemName}, tail: &item{name: itemName},
+			head: buf, tail: buf,
 		}
 	} else {
 		j.tail.next = &item{
@@ -56,8 +57,12 @@ func (q queue) getFromQueue(queueName string, timeout string) (string, error) {
 		// 	head: &item{name: itemName}, tail: &item{name: itemName}, // make timeout
 		fmt.Println(timeout)
 	} else {
-		res = j.head.name
-		j.head = j.head.next
+		if j.head == nil {
+			fmt.Println(timeout)
+		} else {
+			res = j.head.name
+			j.head = j.head.next
+		}
 	}
 	return res, nil
 }
@@ -112,4 +117,10 @@ func WrapOK(w http.ResponseWriter, answer string) {
 func main() {
 	flag.Parse()
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(*port), handler()))
+	// manager.putInQueue("animal", "a")
+	// manager.putInQueue("animal", "b")
+	// manager.putInQueue("animal", "c")
+	// manager.getFromQueue("animal", "1")
+	// manager.getFromQueue("animal", "1")
+	// manager.getFromQueue("animal", "1")
 }
